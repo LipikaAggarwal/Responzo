@@ -14,25 +14,27 @@ export async function POST(req) {
   }
 
   const prompt = `
-Convert the following code to mobile-first responsive HTML using Tailwind CSS. 
-Maintain the layout and structure as closely as possible.
+Convert this code into responsive HTML using Tailwind CSS.
+Return only the HTML code (no explanations, no markdown, no extra text).
+Make it mobile-first and optimized.
 
-\`\`\`html
+Code:
 ${code}
-\`\`\`
 `;
 
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
 
-    console.log("Gemini output:", text);
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const result = await model.generateContent(prompt);
+
+    let text = result.response.text();
+
+    // remove markdown wrappers
+    text = text.replace(/```html|```/g, "").trim();
 
     return NextResponse.json({
       responsive: text,
-      explanation: "Generated using Gemini Pro via Google Generative AI.",
+      explanation: "Generated using Gemini 1.5 Flash (free)."
     });
   } catch (error) {
     console.error("Gemini API Error:", error);
